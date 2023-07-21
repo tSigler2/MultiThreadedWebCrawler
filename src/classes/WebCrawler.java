@@ -13,6 +13,8 @@ public class WebCrawler implements Runnable{
 	private String fLink;
 	private ArrayList<String> visitedLinks = new ArrayList<String>();
 	private int ID;
+	public File f = new File("txtFiles/output.txt");
+	public File i = new File("txtFiles/input.txt");
 	
 	//Constructor
 	public WebCrawler(String link, int n, int depth) {
@@ -44,10 +46,6 @@ public class WebCrawler implements Runnable{
 					
 					//Writing out urls to output of crawled pages and remembering most recently crawled page
 					try {
-						File f = new File("txtFiles/output.txt");
-						BufferedReader r = new BufferedReader(new FileReader(f));
-						r.close();
-						File i = new File("txtFiles/input.txt");
 						PrintWriter flush = new PrintWriter(i);
 						flush.print("");
 						flush.close();
@@ -64,6 +62,7 @@ public class WebCrawler implements Runnable{
 				}
 			}
 		}
+		return;
 	}
 	
 	//Using JSoup to access web pages via http:// or https:// urls
