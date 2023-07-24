@@ -1,6 +1,7 @@
 # MultiThreadedWebCrawler
 
 ## Multithreaded Web Crawler made in Java
+## Uses JSoup for page requests
 
 ### Managed with Maven
 
