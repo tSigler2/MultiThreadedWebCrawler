@@ -6,8 +6,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
+import java.net.URISyntaxException;
+import java.io.InputStreamReader;
+import java.io.InputStream;
 
 public class Main {
+    public static ConcurrentHashMap<Integer, String> activeUrls = new ConcurrentHashMap<>();
+
     public static void main(String[] args) {
         try (Scanner console = new Scanner(System.in)) {
             System.out.print("Number of threads you'd like to use: ");
@@ -16,11 +22,10 @@ public class Main {
             System.out.print("Depth for each thread to crawl: ");
             int d = getInt(console);
 
-            // Create WebCrawler bots from list of urls
-            try (BufferedReader r = new BufferedReader(new FileReader("txtFiles/input.txt"))) {
+            try (BufferedReader r = new BufferedReader(new InputStreamReader(Main.class.getResourceAsStream("/input.txt")))) {
                 String line;
                 while (k < n && (line = r.readLine()) != null) {
-                    bots.add(new WebCrawler(line, k + 1, d));
+                    bots.add(new WebCrawler(line, k + 1, d, activeUrls));
                     k++;
                 }
                 if (k < n) {
@@ -32,7 +37,6 @@ public class Main {
                 e.printStackTrace();
             }
 
-            // Start Crawling Threads
             for (WebCrawler w : bots) {
                 try {
                     w.getThread().join();
@@ -43,8 +47,6 @@ public class Main {
             }
         }
     }
-
-    public static ConcurentHashMap<Integer, String> activeUrls = new ConcurentHashMap<>();
 
     private static int getInt(Scanner scanner) {
         while (true) {
@@ -57,5 +59,4 @@ public class Main {
         }
     }
 }
-
 

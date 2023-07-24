@@ -5,23 +5,26 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.Connection;
 
+import java.net.URISyntaxException;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WebCrawler implements Runnable {
     public static final List<String> visitedLinks = Collections.synchronizedList(new ArrayList<>());
-    private static final String OUTPUT_FILE_PATH = "txtFiles/output.txt";
-    private static final String INPUT_FILE_PATH = "txtFiles/input.txt";
+    private static final String OUTPUT_FILE_PATH = "~/Downloads/output.txt";
+    private static final String INPUT_FILE_PATH = "/input.txt";
 
     public int MAX_DEPTH;
     private Thread thread;
     private String fLink;
     private int ID;
+    private ConcurrentHashMap<Integer, String> activeUrls;
 
-    //Constructor
-    public WebCrawler(String link, int n, int depth) {
+    public WebCrawler(String link, int n, int depth, ConcurrentHashMap<Integer, String> activeUrls) {
+        this.activeUrls = activeUrls;
         System.out.println("New Web Crawler");
         fLink = link;
         ID = n;
@@ -33,7 +36,9 @@ public class WebCrawler implements Runnable {
 
     @Override
     public void run() {
+        activeUrls.put(ID, fLink);
         crawl(1, fLink);
+        activeUrls.remove(ID);
     }
 
     private void crawl(int level, String url) {
@@ -50,10 +55,9 @@ public class WebCrawler implements Runnable {
                     }
                 }
 
-                //Writing out urls to output of crawled pages and remembering most recently crawled page
-                try(PrintWriter out = new PrintWriter(new FileWriter(OUTPUT_FILE_PATH, true));
-                    PrintWriter in = new PrintWriter(new FileWriter(INPUT_FILE_PATH, true))) {
-
+                
+                try(PrintWriter out = new PrintWriter(new FileWriter(new File(OUTPUT_FILE_PATH), true));
+                        PrintWriter in = new PrintWriter(new FileWriter(new File(Main.class.getResource(INPUT_FILE_PATH).getPath()), true))) {
                     in.println(url);
                     for(String link : visitedLinks){
                         out.println(link);
@@ -66,7 +70,6 @@ public class WebCrawler implements Runnable {
         }
     }
 
-    //Using JSoup to access web pages via http:// or https:// urls
     private Document request(String url) {
         try {
             Connection con = Jsoup.connect(url);
@@ -86,7 +89,6 @@ public class WebCrawler implements Runnable {
         }
     }
 
-    //Returning threads
     public Thread getThread() {
         return thread;
     }
