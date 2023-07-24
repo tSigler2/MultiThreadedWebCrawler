@@ -1,3 +1,4 @@
+
 package classes;
 
 import org.jsoup.Jsoup;
@@ -5,7 +6,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.Connection;
 
-import java.net.URISyntaxException;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,7 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class WebCrawler implements Runnable {
     public static final List<String> visitedLinks = Collections.synchronizedList(new ArrayList<>());
-    private static final String OUTPUT_FILE_PATH = "~/Downloads/output.txt";
     private static final String INPUT_FILE_PATH = "/input.txt";
 
     public int MAX_DEPTH;
@@ -55,12 +54,17 @@ public class WebCrawler implements Runnable {
                     }
                 }
 
-                
-                try(PrintWriter out = new PrintWriter(new FileWriter(new File(OUTPUT_FILE_PATH), true));
-                        PrintWriter in = new PrintWriter(new FileWriter(new File(Main.class.getResource(INPUT_FILE_PATH).getPath()), true))) {
+                try{
+                    String homeDir = System.getProperty("user.home");
+                    File outFile = new File(homeDir + "/Downloads/output.txt");
+                    if (!outFile.exists()) {
+                        outFile.createNewFile();
+                    }
+                    PrintWriter out = new PrintWriter(new FileWriter(outFile, true));
+                    PrintWriter in = new PrintWriter(new FileWriter(new File(Main.class.getResource(INPUT_FILE_PATH).getPath()), true));
                     in.println(url);
                     for(String link : visitedLinks){
-                        out.println(link);
+                        out.println(link);                    
                     }
                 }
                 catch(IOException e) {
@@ -93,3 +97,4 @@ public class WebCrawler implements Runnable {
         return thread;
     }
 }
+
